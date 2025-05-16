@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 import random
 from user.models import CustomUser, PasswordResetOTP
-from .serializers import  MyTokenObtainPairSerializer, MyTokenRefreshSerializer, RegisterSerializer
+from .serializers import  MyTokenObtainPairSerializer, MyTokenRefreshSerializer, RegisterSerializer, ResetPasswordSerializer, SendOTPSerializer
 from drf_yasg.utils import swagger_auto_schema
 from django.utils.timezone import now
 from datetime import timedelta
@@ -42,19 +42,7 @@ def refresh_token_view(request):
     return Response(serializer.errors, status=400)
 
 
-@swagger_auto_schema(
-    method='post',
-    operation_description="send otp api",
-    manual_parameters=[
-        openapi.Parameter('email', openapi.IN_PATH, description="email", type=openapi.FORMAT_EMAIL)
-    ],
-    responses={
-        200: openapi.Response(description="Successfully sent otp", examples={"application/json": {"message": "Successfully sent otp"}}),
-        403: openapi.Response(description="Bad Request", examples={"application/json": {"message": "Bad Request"}}),
-        404: openapi.Response(description="Email doesnot exist", examples={"application/json": {"message": "Email does not exist"}}),
-    },
-    operation_summary="Email based otp",
-)
+@swagger_auto_schema(method='post', request_body=SendOTPSerializer)    
 @api_view(['POST'])
 def send_otp_view(request):
     email = request.data.get("email")
@@ -63,15 +51,17 @@ def send_otp_view(request):
     except CustomUser.DoesNotExist:
         return Response({"message":"user not found"},status=status.HTTP_404_NOT_FOUND)
     otp=str(random.randint(100000,999999))
-    expites_at = now() + timedelta(minutes=10)
-    PasswordResetOTP.objects.create(user = user,otp = otp, expites_at = expites_at)
+    expires_at = now() + timedelta(minutes=10)
+    PasswordResetOTP.objects.create(user = user,otp = otp, expires_at = expires_at)
     send_mail(subject="Your Password Reset OTP",
               message=f"Your OTP is {otp}",
+              from_email= "yaswanthsiddanatham264@gmail.com",
               recipient_list=[email]
               )
     return Response({'message':'OTP sent to email'},status=status.HTTP_200_OK)
 
 
+@swagger_auto_schema(method='post', request_body=ResetPasswordSerializer)
 @api_view(['POST'])
 def reset_password_view(request):
     email = request.data.get('email')
@@ -88,7 +78,6 @@ def reset_password_view(request):
         return Response({"messgae":"Invalid or expired OTP"},status=status.HTTP_400_BAD_REQUEST)
     user.set_password(new_password)
     user.save()
-
     otp_obj.is_used = True
     otp_obj.save()
     return Response({"message":"Password reset successfully"},status=status.HTTP_200_OK)
