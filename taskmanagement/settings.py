@@ -166,3 +166,18 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = "yaswanthsiddanatham264@gmail.com"
 EMAIL_HOST_PASSWORD = "sdxo bajn ifkx umor"
+
+import dj_database_url, os, sys
+DEBUG = False                        
+ALLOWED_HOSTS = ["*"]               
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
+
+DATABASES = {
+    "default": dj_database_url.config(
+        default=os.getenv("DATABASE_URL", "postgresql://neondb_owner:npg_Gw63LWuolmgx@ep-raspy-field-a4qotayn-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require"),
+        conn_max_age=600, ssl_require=not DEBUG
+    )
+}
