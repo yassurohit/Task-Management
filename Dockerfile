@@ -24,4 +24,6 @@ RUN python manage.py collectstatic --noinput
 # Port (Render uses this)
 EXPOSE 8000
 
-ENTRYPOINT ["/app/entrypoint.sh"]
+RUN python manage.py migrate
+# Start app
+CMD ["gunicorn", "taskmanagement.wsgi:application", "--bind", "0.0.0.0:8000"]
