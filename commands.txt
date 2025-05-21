@@ -1,0 +1,15 @@
+//docker file
+docker build --tag python-django .
+docker run --publish 8000:8000 python-django
+
+//docker compose
+docker-compose build
+docker-compose run -rm app django-admin startproject core.
+docker-compose up
+
+
+//with database
+docker-compose build
+docker-compose run -rm app django-admin startproject core.
+docker-compose up
+docker exec -it django_app /bin/bash
