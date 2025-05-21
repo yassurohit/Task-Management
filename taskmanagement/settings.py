@@ -12,8 +12,6 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
-import dj_database_url
-from decouple import config
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -28,11 +26,10 @@ SECRET_KEY = 'django-insecure-nog5$%s7^a5-90nme)zt4%+b)8kys#z%^ae6g&$%&8oja@)j*g
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=False, cast=bool)
+DEBUG = True
 ALLOWED_HOSTS = ['*']  # You can restrict this later
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
 REST_FRAMEWORK = {
@@ -61,7 +58,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -114,20 +110,17 @@ SWAGGER_SETTINGS = {
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'taskmanagement',
-#         'USER': 'postgres',
-#         'PASSWORD': 'postgres',
-#         'HOST': 'localhost', 
-#         'PORT': '5432',      
-#     }
-# }
-import dj_database_url
 DATABASES = {
-    'default': dj_database_url.config(conn_max_age=600)
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'taskmanagement',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'db', 
+        'PORT': '5432',      
+    }
 }
+
 
 
 
@@ -180,4 +173,3 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = "yaswanthsiddanatham264@gmail.com"
 EMAIL_HOST_PASSWORD = "sdxo bajn ifkx umor"
-
